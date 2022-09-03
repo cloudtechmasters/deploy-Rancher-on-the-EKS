@@ -78,3 +78,36 @@ kubectl -n cattle-system rollout status deploy/rancher
       kubectl -n cattle-system get deploy rancher
       NAME      DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
       rancher   3         3         3            3           3m
+      
+      [root@ip-172-31-83-184 opt]# k get svc -n cattle-system
+      NAME              TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+      rancher           ClusterIP   10.100.77.253   <none>        80/TCP,443/TCP   5m37s
+      rancher-webhook   ClusterIP   10.100.168.69   <none>        443/TCP          2m57s
+      webhook-service   ClusterIP   10.100.88.79    <none>        443/TCP          2m57s
+   
+Update the Type to LoadBalancer from ClusterIP for service rancher.   
+   
+      [root@ip-172-31-83-184 opt]# kubectl edit svc rancher -n cattle-system
+      service/rancher edited
+      [root@ip-172-31-83-184 opt]# k get svc -n cattle-system
+      NAME              TYPE           CLUSTER-IP      EXTERNAL-IP                                                               PORT(S)                      AGE
+      rancher           LoadBalancer   10.100.77.253   ac39a7edc6c20457a961e6a03576939d-1729768578.us-east-1.elb.amazonaws.com   80:32188/TCP,443:31188/TCP   6m19s
+      rancher-webhook   ClusterIP      10.100.168.69   <none>                                                                    443/TCP                      3m39s
+      webhook-service   ClusterIP      10.100.88.79    <none>                                                                    443/TCP                      3m39s
+
+Now login to the loadBalancer URL for rancher service:
+
+https://ac39a7edc6c20457a961e6a03576939d-1729768578.us-east-1.elb.amazonaws.com
+
+Use password:
+
+kubectl get secret --namespace cattle-system bootstrap-secret -o go-template='{{.data.bootstrapPassword|base64decode}}{{"\n"}}'
+
+Set your own password, you will able to see below page.
+
+<img width="1524" alt="image" src="https://user-images.githubusercontent.com/68885738/188266791-fc745c6a-f2ea-4687-9135-02e23e583857.png">
+
+
+
+
+
